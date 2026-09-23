@@ -5,10 +5,10 @@ import type { QuestDraft } from "@/lib/domain";
 import { questCopy, type Locale } from "@/lib/i18n";
 
 const labels = {
-  fr: { deck: "TABLEAU DES QUÊTES", available: "missions disponibles", objectives: "objectifs" },
-  en: { deck: "QUEST DECK", available: "available missions", objectives: "objectives" },
-  de: { deck: "QUEST-TAFEL", available: "verfügbare Missionen", objectives: "Ziele" },
-  es: { deck: "TABLERO DE MISIONES", available: "misiones disponibles", objectives: "objetivos" },
+  fr: { deck: "TABLEAU DES QUÊTES", available: "missions disponibles", objectives: "objectifs", multi: "QUÊTES PARALLÈLES" },
+  en: { deck: "QUEST DECK", available: "available missions", objectives: "objectives", multi: "PARALLEL QUESTS" },
+  de: { deck: "QUEST-TAFEL", available: "verfügbare Missionen", objectives: "Ziele", multi: "PARALLELE QUESTS" },
+  es: { deck: "TABLERO DE MISIONES", available: "misiones disponibles", objectives: "objetivos", multi: "MISIONES PARALELAS" },
 } as const;
 
 const emptyState: CloudQuestState = {
@@ -42,7 +42,7 @@ export function QuestDeck({
           <span className="micro-label">{t.deck}</span>
           <h2>{quests.length} {t.available}</h2>
         </div>
-        <span className="live-chip">MULTI QUEST</span>
+        <span className="live-chip">{t.multi}</span>
       </div>
 
       <div className="quest-deck-grid">
