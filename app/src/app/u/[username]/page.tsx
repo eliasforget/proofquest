@@ -24,6 +24,14 @@ const labels = {
     proofCommit: "Commit preuve",
     scans: "scans",
     repositoriesWord: "dépôts",
+    notFoundTitle: "Profil introuvable",
+    notFoundBody: "Ce profil est privé ou n'existe pas.",
+    commitBacked: "adossées à un commit GitHub",
+    repositoryEvidence: "preuves de repository",
+    serverVerified: "vérifié côté serveur",
+    skillsWord: "compétences",
+    evidenceMap: "CARTE DE PREUVES",
+    verifiedChip: "VÉRIFIÉ",
   },
   en: {
     identity: "PUBLIC PROOF PROFILE",
@@ -38,6 +46,14 @@ const labels = {
     proofCommit: "Proof commit",
     scans: "scans",
     repositoriesWord: "repositories",
+    notFoundTitle: "Profile not found",
+    notFoundBody: "This profile is private or does not exist.",
+    commitBacked: "backed by a GitHub commit",
+    repositoryEvidence: "repository evidence",
+    serverVerified: "server verified",
+    skillsWord: "skills",
+    evidenceMap: "EVIDENCE MAP",
+    verifiedChip: "VERIFIED",
   },
   de: {
     identity: "ÖFFENTLICHES NACHWEISPROFIL",
@@ -52,6 +68,14 @@ const labels = {
     proofCommit: "Nachweis-Commit",
     scans: "Scans",
     repositoriesWord: "Repositories",
+    notFoundTitle: "Profil nicht gefunden",
+    notFoundBody: "Dieses Profil ist privat oder existiert nicht.",
+    commitBacked: "durch einen GitHub-Commit belegt",
+    repositoryEvidence: "Repository-Nachweise",
+    serverVerified: "serverseitig verifiziert",
+    skillsWord: "Skills",
+    evidenceMap: "NACHWEISKARTE",
+    verifiedChip: "VERIFIZIERT",
   },
   es: {
     identity: "PERFIL PÚBLICO DE PRUEBAS",
@@ -66,6 +90,14 @@ const labels = {
     proofCommit: "Commit de prueba",
     scans: "análisis",
     repositoriesWord: "repositorios",
+    notFoundTitle: "Perfil no encontrado",
+    notFoundBody: "Este perfil es privado o no existe.",
+    commitBacked: "respaldadas por un commit de GitHub",
+    repositoryEvidence: "pruebas del repositorio",
+    serverVerified: "verificado en el servidor",
+    skillsWord: "competencias",
+    evidenceMap: "MAPA DE PRUEBAS",
+    verifiedChip: "VERIFICADO",
   },
 } as const;
 
@@ -136,8 +168,8 @@ export default async function PublicProfilePage({
           </div>
         </header>
         <section className="analysis-error-card">
-          <h1>Profil introuvable</h1>
-          <p>Ce profil est privé ou n&apos;existe pas.</p>
+          <h1>{t.notFoundTitle}</h1>
+          <p>{t.notFoundBody}</p>
           <Link className="cta" href="/">
             {authCopy.backHome} →
           </Link>
@@ -281,7 +313,7 @@ export default async function PublicProfilePage({
         <article className="panel proof-stat-card">
           <span>{t.verified}</span>
           <strong>{verifiedQuests.length}</strong>
-          <small>GitHub commit backed</small>
+          <small>{t.commitBacked}</small>
         </article>
         <article className="panel proof-stat-card">
           <span>{t.repositories}</span>
@@ -291,12 +323,12 @@ export default async function PublicProfilePage({
         <article className="panel proof-stat-card">
           <span>{t.evidence}</span>
           <strong>{evidenceCount}</strong>
-          <small>repository evidence</small>
+          <small>{t.repositoryEvidence}</small>
         </article>
         <article className="panel proof-stat-card proof-stat-xp">
           <span>PROOF XP</span>
           <strong>{totalXp.toLocaleString(locale)}</strong>
-          <small>server verified</small>
+          <small>{t.serverVerified}</small>
         </article>
       </section>
 
@@ -305,10 +337,10 @@ export default async function PublicProfilePage({
           <div className="panel-head">
             <div>
               <span className="micro-label">{t.skills}</span>
-              <h2>{skills.length} skills</h2>
+              <h2>{skills.length} {t.skillsWord}</h2>
               <p>{t.skillsBody}</p>
             </div>
-            <span className="live-chip">EVIDENCE MAP</span>
+            <span className="live-chip">{t.evidenceMap}</span>
           </div>
 
           {skills.length ? (
@@ -375,7 +407,7 @@ export default async function PublicProfilePage({
             <span className="micro-label">{t.activity}</span>
             <h2>{verifiedQuests.length}</h2>
           </div>
-          <span className="live-chip">VERIFIED</span>
+          <span className="live-chip">{t.verifiedChip}</span>
         </div>
 
         {verifiedQuests.length ? (
