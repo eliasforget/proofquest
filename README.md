@@ -92,3 +92,18 @@ La progression n'est plus liée à une égalité fragile entre le propriétaire 
 - les scans multi-repositories acceptent les dépôts où l'utilisateur a une contribution publique reconnue.
 
 Graphify est intégré comme outil de cartographie locale/CI du code dans `app/src`. Les sorties `graphify-out/` sont des artefacts de travail et ne sont pas versionnées.
+
+
+## ProofQuest v0.11
+
+La page publique devient un véritable **proof portfolio** :
+
+- constellation de compétences multi-repositories ;
+- nombre de preuves techniques et de repositories cartographiés ;
+- timeline des quêtes vérifiées ;
+- lien direct vers le commit GitHub utilisé comme preuve ;
+- XP et niveau vérifiés côté serveur.
+
+Les repositories peuvent désormais conserver plusieurs types de quêtes actives simultanément. Le moteur d'analyse expose un **quest deck** et la clé primaire Supabase inclut le type de quête.
+
+Graphify a aussi guidé un premier refactor architectural : le transport GitHub et le moteur de quêtes sont maintenant séparés du gros analyseur `github.ts`.
