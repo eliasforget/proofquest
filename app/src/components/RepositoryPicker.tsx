@@ -19,8 +19,16 @@ export function RepositoryPicker({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return repositories;
+
     return repositories.filter((repo) =>
-      [repo.name, repo.fullName, repo.description ?? "", repo.language ?? ""]
+      [
+        repo.name,
+        repo.fullName,
+        repo.owner,
+        repo.relationship,
+        repo.description ?? "",
+        repo.language ?? "",
+      ]
         .join(" ")
         .toLowerCase()
         .includes(q),
@@ -42,14 +50,17 @@ export function RepositoryPicker({
       <div className="repository-card-grid">
         {filtered.map((repo) => {
           const [owner, name] = repo.fullName.split("/");
+
           return (
             <article className="repository-card" key={repo.id}>
               <div className="repository-card-head">
                 <div>
                   <span className="micro-label">{repo.language ?? "MULTI"}</span>
                   <h2>{repo.name}</h2>
+                  <small className="repository-owner">@{repo.owner}</small>
                 </div>
                 <div className="repository-card-flags">
+                  {repo.relationship === "member" ? <span>MEMBER</span> : null}
                   {repo.fork ? <span>FORK</span> : null}
                   {repo.archived ? <span>ARCHIVED</span> : null}
                 </div>
@@ -58,7 +69,11 @@ export function RepositoryPicker({
               <div className="repository-card-meta">
                 <span>★ {repo.stars}</span>
                 <span>⑂ {repo.forks}</span>
-                <span>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(repo.updatedAt))}</span>
+                <span>
+                  {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                    new Date(repo.updatedAt),
+                  )}
+                </span>
               </div>
               <div className="repository-card-actions">
                 <Link
@@ -67,14 +82,23 @@ export function RepositoryPicker({
                 >
                   {copy.analyze} →
                 </Link>
-                <a className="ghost compact" href={repo.url} target="_blank" rel="noreferrer">GitHub ↗</a>
+                <a
+                  className="ghost compact"
+                  href={repo.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  GitHub ↗
+                </a>
               </div>
             </article>
           );
         })}
       </div>
 
-      {filtered.length === 0 ? <p className="repository-empty">{copy.empty}</p> : null}
+      {filtered.length === 0 ? (
+        <p className="repository-empty">{copy.empty}</p>
+      ) : null}
     </div>
   );
 }

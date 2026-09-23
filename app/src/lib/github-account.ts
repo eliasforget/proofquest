@@ -5,6 +5,8 @@ export type GitHubRepositorySummary = {
   id: number;
   name: string;
   fullName: string;
+  owner: string;
+  relationship: "owner" | "member";
   description: string | null;
   url: string;
   language: string | null;
@@ -23,10 +25,13 @@ export async function listPublicRepositoriesForUser(username: string) {
     "X-GitHub-Api-Version": API_VERSION,
     "User-Agent": "ProofQuest",
   };
-  if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
 
   const response = await fetch(
-    `${GITHUB_API}/users/${encodeURIComponent(username)}/repos?type=owner&sort=updated&direction=desc&per_page=100`,
+    `${GITHUB_API}/users/${encodeURIComponent(username)}/repos?type=all&sort=updated&direction=desc&per_page=100`,
     { headers, next: { revalidate: 120 } },
   );
 
@@ -36,6 +41,7 @@ export async function listPublicRepositoriesForUser(username: string) {
     id: number;
     name: string;
     full_name: string;
+    owner: { login: string };
     description: string | null;
     html_url: string;
     language: string | null;
@@ -46,10 +52,15 @@ export async function listPublicRepositoriesForUser(username: string) {
     updated_at: string;
   }>;
 
+  const normalizedUsername = username.toLowerCase();
+
   return rows.map((repo): GitHubRepositorySummary => ({
     id: repo.id,
     name: repo.name,
     fullName: repo.full_name,
+    owner: repo.owner.login,
+    relationship:
+      repo.owner.login.toLowerCase() === normalizedUsername ? "owner" : "member",
     description: repo.description,
     url: repo.html_url,
     language: repo.language,

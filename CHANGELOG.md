@@ -1,3 +1,14 @@
+## v0.10.0 — Contribution-bound progression
+
+- Store the durable GitHub numeric user ID on ProofQuest profiles.
+- Start quests server-side with a canonical baseline and server timestamp.
+- Require a post-start GitHub commit from the authenticated GitHub identity before XP can be awarded.
+- Require the proof commit to touch files relevant to the quest.
+- Require at least one objective to become newly complete after quest start.
+- Support transferred repositories, collaborators and organization repositories without relying on owner=username.
+- Expand repository discovery to public member repositories.
+- Add Graphify tooling and a CI artifact for codebase maps.
+
 ## v0.9.0 — Verified progression
 
 - Owned repository scans are stored in Supabase.
