@@ -4,6 +4,7 @@ import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { RepositoryAnalysisExperience } from "@/components/RepositoryAnalysisExperience";
 import { getAccountSnapshot } from "@/lib/auth";
+import { getCloudQuestState, saveCloudScan } from "@/lib/cloud-progression-server";
 import { analyzePublicRepository, GitHubAnalysisError } from "@/lib/github";
 import { getDictionary } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale-server";
@@ -23,7 +24,9 @@ export default async function RepositoryAnalysisPage({
 
   try {
     const analysis = await analyzePublicRepository(owner, repo, { fresh });
-    return <RepositoryAnalysisExperience analysis={analysis} locale={locale} account={account} />;
+    await saveCloudScan(account, analysis);
+    const cloudQuestState = await getCloudQuestState(account, analysis);
+    return <RepositoryAnalysisExperience analysis={analysis} locale={locale} account={account} cloudQuestState={cloudQuestState} />;
   } catch (error) {
     const status = error instanceof GitHubAnalysisError ? error.status : undefined;
     const message = status === 400 ? t.analyze.errors.invalid : status === 404 ? t.analyze.errors.notFound : status === 403 ? t.analyze.errors.rateLimit : t.analyze.errors.generic;

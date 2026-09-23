@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
+import { CloudQuestPanel } from "@/components/CloudQuestPanel";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { MetricList } from "@/components/MetricList";
 import { ScanDeltaCard } from "@/components/ScanDeltaCard";
 import { SkillTree } from "@/components/SkillTree";
 import type { AccountSnapshot } from "@/lib/auth";
+import type { CloudQuestState } from "@/lib/cloud-progression-server";
 import type { RepositoryAnalysis } from "@/lib/domain";
 import { evidenceLabel, getDictionary, questCopy, type Locale } from "@/lib/i18n";
 
@@ -17,7 +19,7 @@ function formatUtc(iso: string, locale: Locale) {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(iso));
 }
 
-export function RepositoryDashboard({ analysis, locale, account }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot }) {
+export function RepositoryDashboard({ analysis, locale, account, cloudQuestState }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot; cloudQuestState: CloudQuestState }) {
   const { repository, progression } = analysis;
   const t = getDictionary(locale);
   const quest = questCopy(analysis.quest, locale);
@@ -88,7 +90,7 @@ export function RepositoryDashboard({ analysis, locale, account }: { analysis: R
                 return <li key={criterion} className={done ? "objective-done" : "objective-pending"}><span className="objective-state">{done ? `✓ ${t.common.completed}` : `○ ${t.common.pending}`}</span>{criterion}</li>;
               })}
             </ol>
-            <div className="quest-progress"><span style={{ width: `${questProgress}%` }} /></div><div className="quest-meta"><span>{completedObjectives} / {quest.criteria.length} {t.common.objectives}</span><strong>+{analysis.quest.xpReward} XP</strong></div>
+            <div className="quest-progress"><span style={{ width: `${questProgress}%` }} /></div><div className="quest-meta"><span>{completedObjectives} / {quest.criteria.length} {t.common.objectives}</span><strong>+{analysis.quest.xpReward} XP</strong></div><CloudQuestPanel account={account} repositoryFullName={repository.fullName} quest={analysis.quest} state={cloudQuestState} locale={locale} />
           </section>
 
           <section className="panel evidence-panel">
@@ -99,7 +101,7 @@ export function RepositoryDashboard({ analysis, locale, account }: { analysis: R
           </section>
         </aside>
       </section>
-      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.8</footer>
+      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.9</footer>
     </main>
   );
 }

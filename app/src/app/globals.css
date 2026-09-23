@@ -701,3 +701,240 @@ body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opa
   font: 9px ui-monospace, monospace;
   overflow-wrap: anywhere;
 }
+
+
+/* ProofQuest v0.9 verified progression */
+.cloud-quest-runtime {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.cloud-quest-runtime-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cloud-quest-runtime-head > strong {
+  color: var(--green);
+  font: 800 9px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.cloud-quest-runtime > p,
+.cloud-quest-feedback {
+  margin: 10px 0 0;
+  color: #7e879c;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.cloud-quest-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.active-quest-chip,
+.cloud-quest-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(103,231,255,.15);
+  background: rgba(103,231,255,.045);
+  color: #9fdae5;
+  font: 750 8px ui-monospace, monospace;
+}
+
+.cloud-quest-completed {
+  margin-top: 12px;
+  color: var(--green);
+  border-color: rgba(88,240,169,.18);
+  background: rgba(88,240,169,.04);
+}
+
+.progress-overview-grid,
+.progress-two-column,
+.global-skill-panel {
+  width: min(1220px, calc(100% - 40px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.progress-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.progression-stat-card {
+  padding: 22px;
+  min-height: 150px;
+}
+
+.progression-stat-card > strong {
+  display: block;
+  margin-top: 15px;
+  font-size: 42px;
+  letter-spacing: -.05em;
+}
+
+.progression-stat-card > p {
+  margin: 8px 0 0;
+  color: #737c91;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.global-skill-panel {
+  margin-top: 14px;
+  padding: 24px;
+}
+
+.global-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.global-skill-grid article {
+  display: grid;
+  grid-template-columns: 52px minmax(0,1fr);
+  align-items: center;
+  gap: 13px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 16px;
+  background: rgba(255,255,255,.018);
+}
+
+.global-skill-orb {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border: 1px solid rgba(183,169,255,.22);
+  background: radial-gradient(circle at 30% 20%, rgba(183,169,255,.16), rgba(16,17,25,.9) 70%);
+}
+
+.global-skill-orb strong {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.global-skill-orb span {
+  margin-top: 2px;
+  color: #687187;
+  font: 700 6px ui-monospace, monospace;
+}
+
+.global-skill-copy > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.global-skill-copy strong {
+  font-size: 11px;
+}
+
+.global-skill-copy span,
+.global-skill-copy small {
+  color: #6e778d;
+  font: 8px ui-monospace, monospace;
+}
+
+.global-skill-bar {
+  height: 4px;
+  margin: 9px 0 7px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #1a1d29;
+}
+
+.global-skill-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a998ff, #69e9ff);
+}
+
+.progress-two-column {
+  display: grid;
+  grid-template-columns: minmax(0,1.12fr) minmax(0,.88fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.progress-two-column > .panel {
+  width: auto;
+  margin: 0;
+}
+
+.progress-repository-panel {
+  padding: 24px;
+}
+
+.progress-repository-list {
+  display: grid;
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.progress-repository-list article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.progress-repository-list strong {
+  display: block;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.progress-repository-list small {
+  display: block;
+  margin-top: 4px;
+  color: #5f687c;
+  font: 8px ui-monospace, monospace;
+}
+
+.progress-repository-list a {
+  flex: 0 0 auto;
+  color: var(--violet-2);
+  font: 750 8px ui-monospace, monospace;
+}
+
+@media (max-width: 900px) {
+  .progress-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-two-column,
+  .global-skill-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .progress-overview-grid,
+  .progress-two-column,
+  .global-skill-panel {
+    width: calc(100% - 24px);
+  }
+}
