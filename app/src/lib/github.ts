@@ -1,6 +1,7 @@
 import type { Evidence, RepositoryAnalysis, SkillNode } from "@/lib/domain";
 import { buildQuestDeck, chooseQuest, completedQuestList, type DeepFacts } from "@/lib/github/quest-engine";
 import {
+  GitHubAnalysisError,
   githubJson,
   githubRawFile,
   type GitHubRepository,
@@ -24,7 +25,7 @@ export type GitHubAnalysisOptions = {
   fresh?: boolean;
 };
 
-export { GitHubAnalysisError } from "@/lib/github/client";
+export { GitHubAnalysisError };
 
 function dependencySet(packages: LoadedPackage[]) {
   return new Set(
