@@ -2,17 +2,20 @@
 
 ## Immediate
 
-1. Validate v0.10 end-to-end on a transferred/collaborative repository.
-2. Add more server-verified quest families (CI/CD, security, documentation).
-3. Show the verified commit proof directly in the public profile.
-4. Add a richer global skill graph fed by multiple repository scans.
-5. Instrument onboarding, first scan, quest start and quest completion events.
+1. Tester la v0.11 sur un profil rendu public et vérifier les liens de commit.
+2. Ajouter de nouvelles familles de quêtes vérifiables : CI/CD, documentation et sécurité.
+3. Ajouter une vue détaillée d'une preuve avec diff GitHub, objectifs débloqués et repository.
+4. Ajouter des achievements calculés côté serveur.
+5. Instrumenter onboarding → scan → quest start → verified completion → retour utilisateur.
 
-## Graphify
+## Architecture
 
-Use `scripts/GRAPHIFY_CODE.ps1` locally to refresh the code graph.
-GitHub Actions also publishes a `proofquest-graphify` artifact on relevant pushes.
+Graphify a confirmé que le gros analyseur GitHub devait être découpé. v0.11 extrait déjà :
+- `lib/github/client.ts` ;
+- `lib/github/quest-engine.ts`.
+
+Continuer progressivement sans régression avant de séparer complètement l'Evidence Engine.
 
 ## Product rule
 
-Do not add paid acquisition or mobile work until sign-in, repository selection, analysis, verified progression and return usage are stable.
+Ne pas lancer d'acquisition payante avant d'avoir validé plusieurs retours utilisateurs sur la boucle : connexion → analyse → quête → commit → preuve → profil public.
