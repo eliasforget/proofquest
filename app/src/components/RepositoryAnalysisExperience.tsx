@@ -7,9 +7,10 @@ import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { RepositoryDashboard } from "@/components/RepositoryDashboard";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { AccountSnapshot } from "@/lib/auth";
+import type { CloudQuestState } from "@/lib/cloud-progression-server";
 import type { RepositoryAnalysis } from "@/lib/domain";
 
-export function RepositoryAnalysisExperience({ analysis, locale, account }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot }) {
+export function RepositoryAnalysisExperience({ analysis, locale, account, cloudQuestState }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot; cloudQuestState: CloudQuestState }) {
   const t = getDictionary(locale).scan;
   const [step, setStep] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -24,7 +25,7 @@ export function RepositoryAnalysisExperience({ analysis, locale, account }: { an
     return () => window.clearTimeout(timer);
   }, [step, revealed, t.events.length]);
 
-  if (revealed) return <RepositoryDashboard analysis={analysis} locale={locale} account={account} />;
+  if (revealed) return <RepositoryDashboard analysis={analysis} locale={locale} account={account} cloudQuestState={cloudQuestState} />;
 
   return (
     <main className="site-shell analyze-page">
