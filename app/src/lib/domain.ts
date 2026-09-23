@@ -68,6 +68,7 @@ export type RepositoryAnalysis = {
   metrics: Array<readonly [string, number]>;
   evidence: Evidence[];
   quest: QuestDraft;
+  quests: QuestDraft[];
   completedQuests: Array<{ kind: QuestDraft["kind"]; xpReward: number }>;
   progression: {
     level: number;

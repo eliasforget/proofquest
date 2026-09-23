@@ -492,7 +492,7 @@ Deno.serve(
               baseline_completed_objective_ids: baseline,
               objective_count: evaluation.objectives.length,
             },
-            { onConflict: "user_id,repository_full_name" },
+            { onConflict: "user_id,repository_full_name,kind" },
           );
 
         if (activeError) throw activeError;

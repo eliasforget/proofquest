@@ -1,5 +1,5 @@
 import type { AccountSnapshot } from "@/lib/auth";
-import type { RepositoryAnalysis } from "@/lib/domain";
+import type { QuestDraft, RepositoryAnalysis } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/server";
 
 const GITHUB_API = "https://api.github.com";
@@ -11,6 +11,10 @@ export type CloudQuestState = {
   completed: boolean;
   totalXp: number;
 };
+
+export type CloudQuestStates = Partial<
+  Record<QuestDraft["kind"], CloudQuestState>
+>;
 
 type GitHubUser = {
   id: number;
@@ -49,6 +53,7 @@ async function hasPublicContribution(
         next: { revalidate: 900 },
       },
     );
+
     if (!identityResponse.ok) return false;
 
     const identity = (await identityResponse.json()) as GitHubUser;
@@ -64,6 +69,7 @@ async function hasPublicContribution(
         next: { revalidate: 300 },
       },
     );
+
     if (!commitsResponse.ok) return false;
 
     const commits = (await commitsResponse.json()) as GitHubCommit[];
@@ -93,45 +99,57 @@ async function canAssociateRepository(
       .select("id")
       .eq("user_id", account.userId)
       .eq("repository_full_name", analysis.repository.fullName)
-      .maybeSingle(),
+      .limit(1),
     supabase
       .from("quest_history")
       .select("id")
       .eq("user_id", account.userId)
       .eq("repository_full_name", analysis.repository.fullName)
-      .limit(1)
-      .maybeSingle(),
+      .limit(1),
   ]);
 
-  if (activeResult.data || historyResult.data) return true;
+  if (
+    (activeResult.data?.length ?? 0) > 0 ||
+    (historyResult.data?.length ?? 0) > 0
+  ) {
+    return true;
+  }
 
   return hasPublicContribution(account, analysis.repository.fullName);
 }
 
-export async function getCloudQuestState(
+export async function getCloudQuestStates(
   account: AccountSnapshot,
   analysis: RepositoryAnalysis,
-): Promise<CloudQuestState> {
+): Promise<CloudQuestStates> {
+  const quests = analysis.quests.length ? analysis.quests : [analysis.quest];
+
   if (!account.signedIn || !account.userId || !account.githubUserId) {
-    return { eligible: false, active: false, completed: false, totalXp: 0 };
+    return Object.fromEntries(
+      quests.map((quest) => [
+        quest.kind,
+        {
+          eligible: false,
+          active: false,
+          completed: false,
+          totalXp: 0,
+        },
+      ]),
+    ) as CloudQuestStates;
   }
 
   const supabase = await createClient();
   const [activeResult, historyResult, progressResult] = await Promise.all([
     supabase
       .from("active_quests")
-      .select("id")
+      .select("kind")
       .eq("user_id", account.userId)
-      .eq("repository_full_name", analysis.repository.fullName)
-      .eq("kind", analysis.quest.kind)
-      .maybeSingle(),
+      .eq("repository_full_name", analysis.repository.fullName),
     supabase
       .from("quest_history")
-      .select("id")
+      .select("kind")
       .eq("user_id", account.userId)
-      .eq("repository_full_name", analysis.repository.fullName)
-      .eq("kind", analysis.quest.kind)
-      .maybeSingle(),
+      .eq("repository_full_name", analysis.repository.fullName),
     supabase
       .from("player_progress")
       .select("total_xp")
@@ -139,12 +157,25 @@ export async function getCloudQuestState(
       .maybeSingle(),
   ]);
 
-  return {
-    eligible: true,
-    active: Boolean(activeResult.data),
-    completed: Boolean(historyResult.data),
-    totalXp: Number(progressResult.data?.total_xp ?? 0),
-  };
+  const activeKinds = new Set(
+    (activeResult.data ?? []).map((row) => String(row.kind)),
+  );
+  const completedKinds = new Set(
+    (historyResult.data ?? []).map((row) => String(row.kind)),
+  );
+  const totalXp = Number(progressResult.data?.total_xp ?? 0);
+
+  return Object.fromEntries(
+    quests.map((quest) => [
+      quest.kind,
+      {
+        eligible: true,
+        active: activeKinds.has(quest.kind),
+        completed: completedKinds.has(quest.kind),
+        totalXp,
+      },
+    ]),
+  ) as CloudQuestStates;
 }
 
 export async function saveCloudScan(
