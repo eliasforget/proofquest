@@ -665,3 +665,39 @@ body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opa
     display: none;
   }
 }
+
+
+.cloud-setup-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0 0;
+  border-top: 1px solid var(--line);
+}
+.cloud-setup-list li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 8px 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cloud-setup-list b {
+  color: var(--violet-2);
+  font: 800 10px ui-monospace, monospace;
+}
+.cloud-setup-list span {
+  color: #aab1c4;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.cloud-setup-list code {
+  grid-column: 2;
+  width: fit-content;
+  max-width: 100%;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(103,231,255,.04);
+  border: 1px solid rgba(103,231,255,.13);
+  color: #94ddeb;
+  font: 9px ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
