@@ -64,3 +64,16 @@ La branche `feat/v0.8-cloud-onboarding` ajoute la première identité cloud rée
 La connexion OAuth GitHub nécessite encore la création d'une OAuth App GitHub et l'activation du provider GitHub dans Supabase. Le callback provider est :
 
 `https://vlgpwhcrlczyzqtdqqes.supabase.co/auth/v1/callback`
+
+
+## ProofQuest v0.9
+
+La progression cloud est maintenant reliée au vrai code :
+
+- les scans de vos propres dépôts sont sauvegardés dans Supabase ;
+- une quête peut être lancée depuis le dashboard d'un dépôt ;
+- la validation finale est effectuée côté serveur sur le dépôt GitHub public ;
+- l'XP canonique est attribué une seule fois par dépôt et par type de quête ;
+- `/progress` agrège les derniers scans en carte globale multi-repositories.
+
+Le vérificateur est déployé comme Supabase Edge Function `verify-quest`.
