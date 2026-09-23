@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { MetricList } from "@/components/MetricList";
 import { ScanDeltaCard } from "@/components/ScanDeltaCard";
 import { SkillTree } from "@/components/SkillTree";
+import type { AccountSnapshot } from "@/lib/auth";
 import type { RepositoryAnalysis } from "@/lib/domain";
 import { evidenceLabel, getDictionary, questCopy, type Locale } from "@/lib/i18n";
 
@@ -15,7 +17,7 @@ function formatUtc(iso: string, locale: Locale) {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(iso));
 }
 
-export function RepositoryDashboard({ analysis, locale }: { analysis: RepositoryAnalysis; locale: Locale }) {
+export function RepositoryDashboard({ analysis, locale, account }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot }) {
   const { repository, progression } = analysis;
   const t = getDictionary(locale);
   const quest = questCopy(analysis.quest, locale);
@@ -33,6 +35,7 @@ export function RepositoryDashboard({ analysis, locale }: { analysis: Repository
         <div className="topbar-cluster">
           <div className="live-chip"><span className="status-dot" /> {t.dashboard.deepScan}</div>
           <LocaleSwitcher locale={locale} />
+          <AccountControl account={account} locale={locale} />
           <Link className="ghost compact" href="/analyze">{t.common.analyzeAnother}</Link>
         </div>
       </header>
@@ -96,7 +99,7 @@ export function RepositoryDashboard({ analysis, locale }: { analysis: Repository
           </section>
         </aside>
       </section>
-      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.4</footer>
+      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.8</footer>
     </main>
   );
 }

@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { getAccountSnapshot } from "@/lib/auth";
 import { getDictionary } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale-server";
 
 export default async function Home() {
-  const locale = await getLocale();
+  const [locale, account] = await Promise.all([getLocale(), getAccountSnapshot()]);
   const t = getDictionary(locale);
 
   return (
@@ -14,7 +16,7 @@ export default async function Home() {
       <div className="ambient ambient-b" />
       <header className="topbar">
         <Brand />
-        <div className="topbar-cluster"><div className="top-actions"><span className="status-dot" /> {t.home.status}</div><LocaleSwitcher locale={locale} /></div>
+        <div className="topbar-cluster"><div className="top-actions"><span className="status-dot" /> {t.home.status}</div><LocaleSwitcher locale={locale} /><AccountControl account={account} locale={locale} /></div>
       </header>
 
       <section className="hero">

@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { RepositoryDashboard } from "@/components/RepositoryDashboard";
 import { getDictionary, type Locale } from "@/lib/i18n";
+import type { AccountSnapshot } from "@/lib/auth";
 import type { RepositoryAnalysis } from "@/lib/domain";
 
-export function RepositoryAnalysisExperience({ analysis, locale }: { analysis: RepositoryAnalysis; locale: Locale }) {
+export function RepositoryAnalysisExperience({ analysis, locale, account }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot }) {
   const t = getDictionary(locale).scan;
   const [step, setStep] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -22,11 +24,11 @@ export function RepositoryAnalysisExperience({ analysis, locale }: { analysis: R
     return () => window.clearTimeout(timer);
   }, [step, revealed, t.events.length]);
 
-  if (revealed) return <RepositoryDashboard analysis={analysis} locale={locale} />;
+  if (revealed) return <RepositoryDashboard analysis={analysis} locale={locale} account={account} />;
 
   return (
     <main className="site-shell analyze-page">
-      <header className="topbar"><Brand /><div className="topbar-cluster"><div className="top-actions"><span className="status-dot" /> {t.live}</div><LocaleSwitcher locale={locale} /></div></header>
+      <header className="topbar"><Brand /><div className="topbar-cluster"><div className="top-actions"><span className="status-dot" /> {t.live}</div><LocaleSwitcher locale={locale} /><AccountControl account={account} locale={locale} /></div></header>
       <section className="scan-layout">
         <div className="scanner">
           <div className="scanner-ring ring-a" /><div className="scanner-ring ring-b" />

@@ -1,3 +1,13 @@
+## v0.8.0 — Cloud onboarding
+
+- GitHub OAuth via Supabase SSR.
+- Public repository picker after sign-in.
+- Persistent cloud identity and opt-in public profile.
+- Progress page backed by Supabase RLS.
+- Reproducible cloud migration in the repository.
+- GitHub Actions CI for typecheck and production build.
+- No database password or server secret committed.
+
 # Changelog
 
 ## 0.4.0 — 2026-09-23

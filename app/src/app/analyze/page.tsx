@@ -1,17 +1,19 @@
 import Link from "next/link";
+import { AccountControl } from "@/components/AccountControl";
 import { AnalyzeRepositoryForm } from "@/components/AnalyzeRepositoryForm";
 import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
+import { getAccountSnapshot } from "@/lib/auth";
 import { getDictionary } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale-server";
 
 export default async function AnalyzePage() {
-  const locale = await getLocale();
+  const [locale, account] = await Promise.all([getLocale(), getAccountSnapshot()]);
   const t = getDictionary(locale);
 
   return (
     <main className="site-shell analyze-page">
-      <header className="topbar"><Brand /><div className="topbar-cluster"><div className="top-actions">{t.analyze.status}</div><LocaleSwitcher locale={locale} /></div></header>
+      <header className="topbar"><Brand /><div className="topbar-cluster"><div className="top-actions">{t.analyze.status}</div><LocaleSwitcher locale={locale} /><AccountControl account={account} locale={locale} /></div></header>
       <section className="analyze-entry">
         <div className="eyebrow">{t.analyze.eyebrow}</div>
         <h1>{t.analyze.title}</h1>
