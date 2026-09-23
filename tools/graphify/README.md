@@ -18,24 +18,24 @@ Par défaut, le script analyse `app/src` afin de rester sur un corpus code-only 
 Sorties :
 
 ```text
-graphify-out/
+app/src/graphify-out/
 ├── graph.json
 ├── GRAPH_REPORT.md
 └── ...
 ```
 
-Le dossier `graphify-out/` est volontairement ignoré par Git.
+Ces sorties sont volontairement ignorées par Git.
 
 ## CI
 
-Le workflow `.github/workflows/graphify.yml` génère également un artefact `proofquest-graphify` lors des changements importants du code. Il peut être téléchargé depuis l'exécution GitHub Actions correspondante.
+Le workflow `.github/workflows/graphify.yml` génère un artefact `proofquest-graphify` lors des changements importants du code. Il contient notamment `graph.json` et `GRAPH_REPORT.md`, téléchargeables depuis l'exécution GitHub Actions correspondante.
 
-## Pourquoi ne pas versionner le skill Graphify complet ?
+## Installation du skill officiel
 
-Le skill officiel peut être installé localement avec :
+Pour installer le skill Graphify adapté à un environnement de développement local :
 
 ```powershell
 uvx --from graphifyy graphify install --project --platform codex
 ```
 
-Cette installation génère les fichiers adaptés à la version installée de Graphify. Garder ici seulement le script et le workflow évite de dupliquer une grosse copie tierce qui peut rapidement devenir obsolète.
+Cette commande génère la version du skill correspondant à la version de Graphify installée, au lieu de conserver dans ProofQuest une copie tierce susceptible de devenir obsolète.
