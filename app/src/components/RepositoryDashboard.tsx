@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
-import { CloudQuestPanel } from "@/components/CloudQuestPanel";
+import { QuestDeck } from "@/components/QuestDeck";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { MetricList } from "@/components/MetricList";
 import { ScanDeltaCard } from "@/components/ScanDeltaCard";
 import { SkillTree } from "@/components/SkillTree";
 import type { AccountSnapshot } from "@/lib/auth";
-import type { CloudQuestState } from "@/lib/cloud-progression-server";
+import type { CloudQuestStates } from "@/lib/cloud-progression-server";
 import type { RepositoryAnalysis } from "@/lib/domain";
-import { evidenceLabel, getDictionary, questCopy, type Locale } from "@/lib/i18n";
+import { evidenceLabel, getDictionary, type Locale } from "@/lib/i18n";
 
 function formatNumber(value: number, locale: Locale) {
   return new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(value);
@@ -19,15 +19,10 @@ function formatUtc(iso: string, locale: Locale) {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(iso));
 }
 
-export function RepositoryDashboard({ analysis, locale, account, cloudQuestState }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot; cloudQuestState: CloudQuestState }) {
+export function RepositoryDashboard({ analysis, locale, account, cloudQuestStates }: { analysis: RepositoryAnalysis; locale: Locale; account: AccountSnapshot; cloudQuestStates: CloudQuestStates }) {
   const { repository, progression } = analysis;
   const t = getDictionary(locale);
-  const quest = questCopy(analysis.quest, locale);
   const visibleEvidence = analysis.evidence.slice(0, 9);
-  const completedObjectives = analysis.quest.objectives.filter((objective) => objective.completed).length;
-  const questProgress = analysis.quest.objectives.length > 0
-    ? Math.round((completedObjectives / analysis.quest.objectives.length) * 100)
-    : 0;
   const rescanPath = `/analyze/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.name)}`;
 
   return (
@@ -62,6 +57,7 @@ export function RepositoryDashboard({ analysis, locale, account, cloudQuestState
 
       {repository.treeTruncated ? <div className="analysis-warning">{t.dashboard.warning}</div> : null}
       <ScanDeltaCard analysis={analysis} locale={locale} />
+      <QuestDeck quests={analysis.quests} repositoryFullName={repository.fullName} account={account} states={cloudQuestStates} locale={locale} />
 
       <section className="dashboard-grid">
         <aside className="panel profile-panel">
@@ -81,18 +77,6 @@ export function RepositoryDashboard({ analysis, locale, account, cloudQuestState
         </section>
 
         <aside className="side-stack">
-          <section className="panel quest-panel">
-            <div className="micro-label">{t.dashboard.nextQuest}</div><div className="quest-icon">⌁</div><h2>{quest.title}</h2><p>{quest.description}</p>
-            <ol className="quest-criteria quest-criteria-live">
-              {quest.criteria.map((criterion, index) => {
-                const objective = analysis.quest.objectives[index];
-                const done = objective?.completed === true;
-                return <li key={criterion} className={done ? "objective-done" : "objective-pending"}><span className="objective-state">{done ? `✓ ${t.common.completed}` : `○ ${t.common.pending}`}</span>{criterion}</li>;
-              })}
-            </ol>
-            <div className="quest-progress"><span style={{ width: `${questProgress}%` }} /></div><div className="quest-meta"><span>{completedObjectives} / {quest.criteria.length} {t.common.objectives}</span><strong>+{analysis.quest.xpReward} XP</strong></div><CloudQuestPanel account={account} repositoryFullName={repository.fullName} quest={analysis.quest} state={cloudQuestState} locale={locale} />
-          </section>
-
           <section className="panel evidence-panel">
             <div className="panel-head"><div><span className="micro-label">{t.dashboard.verifiable}</span><h2>{t.dashboard.evidence}</h2></div></div>
             {visibleEvidence.length > 0 ? (
@@ -101,7 +85,7 @@ export function RepositoryDashboard({ analysis, locale, account, cloudQuestState
           </section>
         </aside>
       </section>
-      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.9</footer>
+      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.11</footer>
     </main>
   );
 }
