@@ -47,3 +47,20 @@ Chaque fonctionnalité doit répondre à au moins une de ces questions :
 - permet-elle de mesurer l'intérêt réel du marché ?
 
 Sinon, la fonctionnalité va au backlog.
+
+
+## ProofQuest v0.8
+
+La branche `feat/v0.8-cloud-onboarding` ajoute la première identité cloud réellement exploitable :
+
+- connexion GitHub via Supabase Auth ;
+- onboarding connecté avec sélection des dépôts publics ;
+- page de progression cloud ;
+- profil public opt-in `/u/[username]` ;
+- configuration Supabase publique intégrée au projet ;
+- migration SQL reproductible ;
+- CI GitHub pour typecheck + build.
+
+La connexion OAuth GitHub nécessite encore la création d'une OAuth App GitHub et l'activation du provider GitHub dans Supabase. Le callback provider est :
+
+`https://vlgpwhcrlczyzqtdqqes.supabase.co/auth/v1/callback`
