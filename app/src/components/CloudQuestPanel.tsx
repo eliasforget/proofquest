@@ -133,6 +133,10 @@ export function CloudQuestPanel({
         : t.already,
     );
     setBusy(false);
+    if (data.awarded) {
+      window.location.assign(`${window.location.pathname}?rescan=1`);
+      return;
+    }
     router.refresh();
   }
 
