@@ -77,3 +77,18 @@ La progression cloud est maintenant reliée au vrai code :
 - `/progress` agrège les derniers scans en carte globale multi-repositories.
 
 Le vérificateur est déployé comme Supabase Edge Function `verify-quest`.
+
+
+## ProofQuest v0.10
+
+La progression n'est plus liée à une égalité fragile entre le propriétaire du dépôt et le username GitHub.
+
+- l'identité GitHub durable (`github_user_id`) est stockée côté serveur ;
+- une quête est démarrée par l'Edge Function, avec baseline et heure serveur ;
+- la validation exige un commit GitHub de l'utilisateur **postérieur au lancement** ;
+- ce commit doit toucher des fichiers pertinents pour la quête ;
+- au moins un nouvel objectif doit avoir été débloqué depuis la baseline ;
+- les dépôts transférés, collaboratifs et d'organisation peuvent donc être validés sans autoriser le farm d'XP sur n'importe quel dépôt public ;
+- les scans multi-repositories acceptent les dépôts où l'utilisateur a une contribution publique reconnue.
+
+Graphify est intégré comme outil de cartographie locale/CI du code dans `app/src`. Les sorties `graphify-out/` sont des artefacts de travail et ne sont pas versionnées.
