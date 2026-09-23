@@ -938,3 +938,26 @@ body::before { content: ""; position: fixed; inset: 0; pointer-events: none; opa
     width: calc(100% - 24px);
   }
 }
+
+
+/* ProofQuest v0.10 */
+.repository-owner {
+  display: block;
+  margin-top: 5px;
+  color: #626b80;
+  font: 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.cloud-proof-link {
+  display: inline-flex;
+  margin-top: 10px;
+  color: #8fe6ff;
+  font: 750 8px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .02em;
+}
+
+.cloud-proof-link:hover,
+.cloud-proof-link:focus-visible {
+  color: #dff8ff;
+  outline: none;
+}
