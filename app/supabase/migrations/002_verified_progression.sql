@@ -4,6 +4,8 @@ grant select, insert, update, delete
 on public.active_quests, public.repository_scans
 to authenticated;
 
+grant usage, select on sequence public.repository_scans_id_seq to authenticated;
+
 create or replace function public.award_verified_quest(
   p_user_id uuid,
   p_repository_full_name text,
