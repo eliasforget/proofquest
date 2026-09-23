@@ -1,3 +1,14 @@
+## v0.11.0 — Proof portfolio and quest deck
+
+- Public profiles now expose a visual multi-repository proof portfolio.
+- Verified quests link to the exact GitHub commit used as proof.
+- Public skill progression aggregates the latest repository scans.
+- A repository can keep several quest kinds active at the same time.
+- The analyzer now exposes a quest deck instead of only one mission.
+- The quest engine and GitHub API transport were extracted from the monolithic analyzer following Graphify findings.
+- Supabase RLS exposes limited scan snapshots only when the profile is explicitly public.
+- Graphify continues to validate the code architecture in CI.
+
 ## v0.10.0 — Contribution-bound progression
 
 - Store the durable GitHub numeric user ID on ProofQuest profiles.
