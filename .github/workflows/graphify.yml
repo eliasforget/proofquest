@@ -30,12 +30,14 @@ jobs:
         run: python -m pip install --upgrade graphifyy
 
       - name: Build ProofQuest code graph
-        run: graphify app/src --no-viz
+        run: |
+          graphify app/src --no-viz
+          graphify cluster-only app/src
 
       - name: Upload graph artifact
         uses: actions/upload-artifact@v4
         with:
           name: proofquest-graphify
-          path: graphify-out/
+          path: app/src/graphify-out/
           if-no-files-found: error
           retention-days: 14
