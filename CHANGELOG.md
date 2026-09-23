@@ -1,3 +1,13 @@
+## v0.9.0 — Verified progression
+
+- Owned repository scans are stored in Supabase.
+- Quests can be started from the repository dashboard.
+- Quest completion is verified server-side against the live public GitHub repository.
+- Canonical XP rewards are granted atomically in Postgres and cannot be doubled.
+- The progression page now aggregates the latest scans into a multi-repository skill matrix.
+- A deployed Supabase Edge Function handles GitHub verification.
+- Profiles remain private by default and raw scan snapshots remain private.
+
 ## v0.8.0 — Cloud onboarding
 
 - GitHub OAuth via Supabase SSR.
