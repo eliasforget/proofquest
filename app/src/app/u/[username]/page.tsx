@@ -1,3 +1,5 @@
+import { publicMetadata, sharingLocale, type PublicSearch } from "@/lib/public-sharing";
+import { safePublicLink } from "@/lib/profile-input";
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
@@ -9,6 +11,10 @@ import { getLocale } from "@/lib/locale-server";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: PublicSearch }) {
+  return publicMetadata(await params, await sharingLocale(searchParams));
+}
 
 const labels = {
   fr: {
@@ -157,12 +163,14 @@ function formatDate(value: string, locale: Locale) {
 
 export default async function PublicProfilePage({
   params,
+  searchParams,
 }: {
+  searchParams: PublicSearch;
   params: Promise<{ username: string }>;
 }) {
   const [{ username }, locale, account] = await Promise.all([
     params,
-    getLocale(),
+    sharingLocale(searchParams),
     getAccountSnapshot(),
   ]);
   const t = labels[locale];
@@ -171,7 +179,7 @@ export default async function PublicProfilePage({
 
   if (!profile) {
     return (
-      <main className="site-shell public-profile-shell">
+      <main lang={locale} className="site-shell public-profile-shell">
         <header className="topbar">
           <Brand />
           <div className="topbar-cluster">
@@ -330,7 +338,7 @@ export default async function PublicProfilePage({
   ];
 
   return (
-    <main className="dashboard-shell public-profile-shell proof-profile-v11">
+    <main lang={locale} className="dashboard-shell public-profile-shell proof-profile-v11">
       <header className="topbar dashboard-top">
         <Brand />
         <div className="topbar-cluster">
@@ -357,6 +365,8 @@ export default async function PublicProfilePage({
             <span className="eyebrow">{t.identity}</span>
             <h1>{profile.display_name || profile.username}</h1>
             <p>@{profile.username}</p>
+            {profile.headline ? <h2>{profile.headline}</h2> : null}
+            <div className="public-profile-links">{(profile.public_links ?? []).filter((url) => safePublicLink(url)).map((url) => <a key={url} href={url} target="_blank" rel="noopener noreferrer nofollow ugc">{new URL(url).hostname} ↗</a>)}</div>
             {profile.bio ? <div className="proof-bio">{profile.bio}</div> : null}
           </div>
         </div>
@@ -529,7 +539,7 @@ export default async function PublicProfilePage({
                   <div className="proof-timeline-reward">
                     <strong>+{quest.xp_reward} XP</strong>
                     {detailsHref ? (
-                      <Link href={detailsHref}>{t.details} →</Link>
+                      <Link href={`${detailsHref}?lang=${locale}`}>{t.details} →</Link>
                     ) : null}
                     {proofUrl ? (
                       <a

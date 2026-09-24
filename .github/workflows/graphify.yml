@@ -11,6 +11,8 @@ on:
       - "architecture/**"
       - "scripts/GRAPHIFY_CODE.ps1"
       - ".github/workflows/graphify.yml"
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

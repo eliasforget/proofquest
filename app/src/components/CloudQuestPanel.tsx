@@ -1,5 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { ShareProof } from "@/components/ShareProof";
+import { getProductCopy } from "@/lib/product-i18n";
+import { recordFunnelEvent } from "@/lib/funnel";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { AccountSnapshot } from "@/lib/auth";
@@ -160,6 +164,7 @@ export function CloudQuestPanel({
       return;
     }
 
+    void recordFunnelEvent(createClient(), account.userId, "quest_start");
     setActive(true);
     setFeedback(t.started);
     setBusy(false);
@@ -186,6 +191,7 @@ export function CloudQuestPanel({
       return;
     }
 
+    if (data.awarded && account.userId) void recordFunnelEvent(createClient(), account.userId, "quest_verified");
     setTotalXp(Number(data.totalXp ?? totalXp));
     setActive(false);
     setProofUrl(data.commitUrl ?? null);
@@ -248,6 +254,7 @@ export function CloudQuestPanel({
         </div>
       )}
 
+      {(state.completed || proofUrl) && account.username ? (account.isPublic ? <ShareProof path={`/u/${encodeURIComponent(account.username)}/proof/${quest.kind}/${repositoryFullName.split("/").map(encodeURIComponent).join("/")}`} title={quest.title} locale={locale} /> : <Link href="/progress">{getProductCopy(locale).publicHint}</Link>) : null}
       {feedback ? <p className="cloud-quest-feedback">{feedback}</p> : null}
       {proofUrl ? (
         <a

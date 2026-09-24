@@ -1,3 +1,4 @@
+import { recordFunnelEvent } from "@/lib/funnel";
 import type { AccountSnapshot } from "@/lib/auth";
 import type { QuestDraft, RepositoryAnalysis } from "@/lib/domain";
 import { createClient } from "@/lib/supabase/server";
@@ -215,10 +216,11 @@ export async function saveCloudScan(
     analyzedAt: analysis.analyzedAt,
   };
 
-  await supabase.from("repository_scans").insert({
+  const { error } = await supabase.from("repository_scans").insert({
     user_id: account.userId,
     repository_full_name: analysis.repository.fullName,
     analyzed_at: analysis.analyzedAt,
     snapshot,
   });
+  if (!error) await recordFunnelEvent(supabase, account.userId, "scan");
 }

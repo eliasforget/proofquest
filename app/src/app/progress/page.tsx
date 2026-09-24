@@ -1,3 +1,6 @@
+import { getProgressCopy } from "@/lib/progress-i18n";
+import { questTitleFor } from "@/lib/i18n";
+import { getProductCopy } from "@/lib/product-i18n";
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
@@ -27,6 +30,7 @@ type ScanSnapshot = {
 export default async function ProgressPage() {
   const locale = await getLocale();
   const copy = getAuthCopy(locale);
+  const t = getProgressCopy(locale);
   const account = await getAccountSnapshot();
 
   if (!account.signedIn || !account.userId) {
@@ -94,12 +98,13 @@ export default async function ProgressPage() {
 
       <section className="progress-cloud-hero panel">
         <div>
-          <span className="eyebrow">PROOFQUEST IDENTITY</span>
+          <span className="eyebrow">{t.identity}</span>
           <h1>{account.displayName || account.username}</h1>
           <p>@{account.username}</p>
         </div>
-        <div className="public-level-orb"><span>LEVEL</span><strong>{level}</strong><small>{totalXp.toLocaleString(locale)} XP</small></div>
+        <div className="public-level-orb"><span>{t.level}</span><strong>{level}</strong><small>{totalXp.toLocaleString(locale)} XP</small></div>
         <div className="progress-cloud-actions">
+          <Link className="ghost compact" href="/settings/profile">{getProductCopy(locale).edit}</Link>
           <ProfileVisibilityToggle userId={account.userId} initialPublic={Boolean(account.isPublic)} locale={locale} />
           {account.isPublic && account.username ? <Link className="ghost compact" href={`/u/${account.username}`}>{copy.publicProfile} ↗</Link> : null}
         </div>
@@ -107,26 +112,26 @@ export default async function ProgressPage() {
 
       <section className="progress-overview-grid">
         <article className="panel progression-stat-card">
-          <span className="micro-label">REPOSITORIES ANALYSÉS</span>
+          <span className="micro-label">{t.repos}</span>
           <strong>{latestScans.length}</strong>
-          <p>Dernier scan conservé pour chaque dépôt.</p>
+          <p>{t.reposBody}</p>
         </article>
         <article className="panel progression-stat-card">
-          <span className="micro-label">PREUVES CARTOGRAPHIÉES</span>
+          <span className="micro-label">{t.evidence}</span>
           <strong>{totalEvidence}</strong>
-          <p>Signaux techniques du dernier état de vos dépôts.</p>
+          <p>{t.evidenceBody}</p>
         </article>
         <article className="panel progression-stat-card">
-          <span className="micro-label">QUÊTES VÉRIFIÉES</span>
+          <span className="micro-label">{t.quests}</span>
           <strong>{quests?.length ?? 0}</strong>
-          <p>Récompenses attribuées uniquement après vérification GitHub.</p>
+          <p>{t.questsBody}</p>
         </article>
       </section>
 
       <section className="panel global-skill-panel">
         <div className="panel-head">
-          <div><span className="micro-label">GLOBAL SKILL MATRIX</span><h2>Votre carte multi-repositories</h2></div>
-          <span className="live-chip">{globalSkills.length} SKILLS</span>
+          <div><span className="micro-label">{t.matrix}</span><h2>{t.map}</h2></div>
+          <span className="live-chip">{globalSkills.length} {t.skills}</span>
         </div>
         {globalSkills.length ? (
           <div className="global-skill-grid">
@@ -136,12 +141,12 @@ export default async function ProgressPage() {
                 <div className="global-skill-copy">
                   <div><strong>{skill.name}</strong><span>{skill.progress}%</span></div>
                   <div className="global-skill-bar"><i style={{ width: `${skill.progress}%` }} /></div>
-                  <small>{skill.repositories} dépôt{skill.repositories > 1 ? "s" : ""}</small>
+                  <small>{skill.repositories} {t.repositories}</small>
                 </div>
               </article>
             ))}
           </div>
-        ) : <p className="progress-empty">Analysez un premier dépôt connecté pour construire votre carte globale.</p>}
+        ) : <p className="progress-empty">{t.emptySkills}</p>}
       </section>
 
       <section className="progress-two-column">
@@ -152,7 +157,7 @@ export default async function ProgressPage() {
               {quests.map((quest) => (
                 <article key={String(quest.id)}>
                   <span className="public-quest-check">✓</span>
-                  <div><strong>{String(quest.kind).toUpperCase()}</strong><p>{quest.repository_full_name}</p><small>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(quest.completed_at))}</small></div>
+                  <div><strong>{questTitleFor(quest.kind as Parameters<typeof questTitleFor>[0], locale)}</strong><p>{quest.repository_full_name}</p><small>{new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(quest.completed_at))}</small></div>
                   <b>+{quest.xp_reward} XP</b>
                 </article>
               ))}
@@ -161,17 +166,17 @@ export default async function ProgressPage() {
         </section>
 
         <section className="panel progress-repository-panel">
-          <div className="panel-head"><div><span className="micro-label">SCAN HISTORY</span><h2>{latestScans.length}</h2></div></div>
+          <div className="panel-head"><div><span className="micro-label">{t.scans}</span><h2>{latestScans.length}</h2></div></div>
           {latestScans.length ? (
             <div className="progress-repository-list">
               {latestScans.slice(0, 10).map((scan) => (
                 <article key={scan.repository}>
                   <div><strong>{scan.repository}</strong><small>{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(scan.analyzedAt))}</small></div>
-                  <Link href={`/analyze/${scan.repository.split("/").map(encodeURIComponent).join("/")}`}>Ouvrir →</Link>
+                  <Link href={`/analyze/${scan.repository.split("/").map(encodeURIComponent).join("/")}`}>{t.open} →</Link>
                 </article>
               ))}
             </div>
-          ) : <p className="progress-empty">Aucun scan cloud enregistré.</p>}
+          ) : <p className="progress-empty">{t.emptyScans}</p>}
         </section>
       </section>
     </main>
