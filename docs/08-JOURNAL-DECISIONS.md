@@ -76,3 +76,13 @@
 **Alternative rejetée** : brancher immédiatement toute l'infrastructure compte utilisateur.
 
 **Impact** : historique non portable entre navigateurs, volontairement temporaire.
+# 24/09/2026 — v0.13, identité publique et partage
+
+- Décision : ajouter un éditeur limité au titre, à la bio et à trois liens HTTPS, avec validation serveur et contraintes SQL. Conserver la publication opt-in et les identifiants GitHub immuables.
+- Raison : rendre le portfolio personnalisable sans affaiblir l'attribution des preuves.
+- Alternative rejetée : un payload de profil générique autorisant des champs d'identité ou de progression.
+- Décision : générer les métadonnées et images sociales avec des lectures anonymes sans cache durable ; conserver la langue dans les URLs partagées.
+- Raison : appliquer la même confidentialité aux robots sociaux qu'aux visiteurs.
+- Alternative rejetée : utiliser une clé de service ou une image persistante pouvant survivre à la dépublication.
+- Décision : collecter seulement cinq jalons quotidiens par compte au maximum, sans contenu ni suivi anonyme. Ces données déclaratives ne sont pas des preuves et ne récompensent jamais l'utilisateur.
+- Impact : migration additive avant le frontend, origine publique à configurer, tests PostgreSQL/RLS et Graphify dans la CI. Détails dans `architecture/013-public-sharing-funnel.md`.

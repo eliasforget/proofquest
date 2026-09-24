@@ -17,6 +17,8 @@ export type ProfileRecord = {
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
+  headline: string;
+  public_links: string[];
   is_public: boolean;
   created_at: string;
   updated_at: string;
@@ -41,7 +43,7 @@ function githubUserId(value: unknown) {
 }
 
 const profileFields =
-  "user_id,username,github_user_id,display_name,avatar_url,bio,is_public,created_at,updated_at";
+  "user_id,username,github_user_id,display_name,avatar_url,bio,headline,public_links,is_public,created_at,updated_at";
 
 export async function ensureCurrentProfile(): Promise<ProfileRecord | null> {
   const supabase = await createClient();

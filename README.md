@@ -33,9 +33,9 @@ ProofQuest/
 
 ## État actuel
 
-**Phase 1 — Evidence Engine v0.4.** L'application analyse maintenant des preuves plus profondes dans `tsconfig`, les scripts `package.json`, GitHub Actions, Dockerfile et certains manifests Kubernetes. Les quêtes affichent des objectifs réellement satisfaits ou manquants, et le bouton de réanalyse force un nouveau scan afin de comparer l'état du dépôt avec le scan précédent dans le navigateur.
+**v0.13 — Profils et preuves partageables.** Supabase Auth et la progression cloud sont intégrés. Les profils disposent d'un éditeur de titre, bio et liens publics ; profils et preuves vérifiées ont des métadonnées Open Graph dynamiques. Le partage conserve la langue FR/EN/DE/ES. Une instrumentation bornée mesure les étapes de connexion, scan, quête, validation et partage sans influer sur l'XP.
 
-Supabase, l'authentification utilisateur et l'IA ne sont pas encore branchés. L'historique actuel est volontairement local (`localStorage`) : il sert à valider la boucle de jeu avant d'introduire une persistance serveur.
+Le scoring reste déterministe et la validation anti-farm exige une contribution GitHub postérieure au lancement de la quête. Avant de déployer la v0.13, appliquer sa migration dédiée et configurer `NEXT_PUBLIC_SITE_URL`. Voir [architecture, migration et validation v0.13](architecture/013-public-sharing-funnel.md).
 
 ## Règle produit
 

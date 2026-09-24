@@ -12,6 +12,12 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
 
   function changeLocale(nextLocale: Locale) {
     document.cookie = `pq-locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("lang")) {
+      url.searchParams.set("lang", nextLocale);
+      router.replace(`${url.pathname}${url.search}${url.hash}`);
+      return;
+    }
     router.refresh();
   }
 

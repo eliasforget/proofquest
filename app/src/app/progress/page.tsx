@@ -1,3 +1,4 @@
+import { getProductCopy } from "@/lib/product-i18n";
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
@@ -100,6 +101,7 @@ export default async function ProgressPage() {
         </div>
         <div className="public-level-orb"><span>LEVEL</span><strong>{level}</strong><small>{totalXp.toLocaleString(locale)} XP</small></div>
         <div className="progress-cloud-actions">
+          <Link className="ghost compact" href="/settings/profile">{getProductCopy(locale).edit}</Link>
           <ProfileVisibilityToggle userId={account.userId} initialPublic={Boolean(account.isPublic)} locale={locale} />
           {account.isPublic && account.username ? <Link className="ghost compact" href={`/u/${account.username}`}>{copy.publicProfile} ↗</Link> : null}
         </div>

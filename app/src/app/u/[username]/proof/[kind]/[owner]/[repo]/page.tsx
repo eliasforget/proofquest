@@ -1,3 +1,5 @@
+import { publicMetadata, publicPath, sharingLocale, type PublicRoute, type PublicSearch } from "@/lib/public-sharing";
+import { ShareProof } from "@/components/ShareProof";
 import Link from "next/link";
 import { AccountControl } from "@/components/AccountControl";
 import { Brand } from "@/components/Brand";
@@ -8,6 +10,10 @@ import { getLocale } from "@/lib/locale-server";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params, searchParams }: { params: Promise<PublicRoute>; searchParams: PublicSearch }) {
+  return publicMetadata(await params, await sharingLocale(searchParams));
+}
 
 const labels = {
   fr: {
@@ -129,7 +135,9 @@ function formatDate(value: string, locale: Locale) {
 
 export default async function PublicProofPage({
   params,
+  searchParams,
 }: {
+  searchParams: PublicSearch;
   params: Promise<{
     username: string;
     kind: string;
@@ -140,7 +148,7 @@ export default async function PublicProofPage({
   const [{ username, kind, owner, repo }, locale, account] =
     await Promise.all([
       params,
-      getLocale(),
+      sharingLocale(searchParams),
       getAccountSnapshot(),
     ]);
 
@@ -219,6 +227,7 @@ export default async function PublicProofPage({
           <span className="eyebrow">{t.proof}</span>
           <h1>{questTitleFor(kindValue, locale)}</h1>
           <p>{quest.repository_full_name}</p>
+          <ShareProof path={publicPath({ username, kind, owner, repo })} title={questTitleFor(kindValue, locale)} locale={locale} />
         </div>
         <div className="proof-detail-xp">
           <span>{t.reward}</span>
@@ -308,7 +317,7 @@ export default async function PublicProofPage({
             <p>{formatDate(startedAt, locale)}</p>
           </div>
 
-          <Link className="ghost compact" href={`/u/${profile.username}`}>
+          <Link className="ghost compact" href={`/u/${profile.username}?lang=${locale}`}>
             ← {t.back}
           </Link>
         </aside>
