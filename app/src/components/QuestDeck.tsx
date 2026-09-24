@@ -46,7 +46,7 @@ export function QuestDeck({
       </div>
 
       <div className="quest-deck-grid">
-        {quests.slice(0, 4).map((draft) => {
+        {quests.slice(0, 7).map((draft) => {
           const quest = questCopy(draft, locale);
           const completedObjectives = draft.objectives.filter(
             (objective) => objective.completed,

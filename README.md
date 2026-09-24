@@ -107,3 +107,24 @@ La page publique devient un véritable **proof portfolio** :
 Les repositories peuvent désormais conserver plusieurs types de quêtes actives simultanément. Le moteur d'analyse expose un **quest deck** et la clé primaire Supabase inclut le type de quête.
 
 Graphify a aussi guidé un premier refactor architectural : le transport GitHub et le moteur de quêtes sont maintenant séparés du gros analyseur `github.ts`.
+
+
+## ProofQuest v0.12
+
+ProofQuest sait maintenant vérifier **7 familles de quêtes** :
+
+- Testing ;
+- Docker ;
+- CI/CD ;
+- Documentation ;
+- Security ;
+- Kubernetes ;
+- Hardening.
+
+Les trois nouvelles familles sont basées sur des signaux explicites : workflows GitHub Actions et build CI, README + architecture + documentation, politique SECURITY + Dependabot/Renovate + CodeQL/dependency review.
+
+Chaque preuve vérifiée peut désormais être ouverte sur une page publique dédiée :
+
+`/u/[username]/proof/[kind]/[owner]/[repo]`
+
+Cette page montre le commit GitHub utilisé comme preuve, les fichiers pertinents, la baseline au lancement et les objectifs nouvellement débloqués. Le profil public calcule aussi des achievements uniquement à partir des données de preuve vérifiées.

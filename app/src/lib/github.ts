@@ -188,6 +188,12 @@ export async function analyzePublicRepository(
   const rootReadme = filePaths.find((path) => /^readme\.(md|mdx|txt)$/i.test(path));
   const architectureDoc = filePaths.find((path) => /(^|\/)(architecture|arch|technical-design|design-doc)(\.[^/]+)?\.md$/i.test(path))
     ?? filePaths.find((path) => /(^|\/)architecture\//i.test(path));
+  const docsFiles = pathMatches(filePaths, /(^|\/)(docs?|documentation)\/.*\.(md|mdx|txt)$/i);
+  const securityPolicy = filePaths.find((path) => /(^|\/)(\.github\/)?security\.md$/i.test(path));
+  const dependencyBot = filePaths.find((path) =>
+    /(^|\/)\.github\/dependabot\.ya?ml$/i.test(path)
+    || /(^|\/)renovate(?:\.json|\.json5|\.ya?ml)$/i.test(path),
+  );
 
   const [tsConfigs, workflows, dockerfiles, manifests, readmeContent] = await Promise.all([
     Promise.all(tsConfigPaths.map(async (path) => ({ path, content: await githubRawFile(safeOwner, safeRepo, path, repository.default_branch, fresh) }))),
@@ -213,7 +219,6 @@ export async function analyzePublicRepository(
   const typecheckScript = scripts.find(({ name, command }) =>
     /^(typecheck|type-check|check-types|types)$/i.test(name) || /\btsc\b[^\n]*--noEmit\b/i.test(command),
   );
-
   const ciTestMatch = firstMatching(
     workflows,
     /(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:test|test:[\w:-]+)\b|\b(?:vitest|jest)\b|\bplaywright\s+test\b|\bcypress\s+run\b/i,
@@ -222,7 +227,15 @@ export async function analyzePublicRepository(
     workflows,
     /(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:typecheck|type-check|check-types|types)\b|\btsc\b[^\n]*--noEmit\b/i,
   );
+  const ciBuildMatch = firstMatching(
+    workflows,
+    /(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?build\b|\bnext\s+build\b|\bvite\s+build\b|\bgradle(?:w)?\s+build\b|\bmvn\s+(?:package|verify)\b/i,
+  );
   const ciDockerBuild = firstMatching(workflows, /\bdocker\s+(?:build|buildx\s+build)\b/i);
+  const codeScanningMatch = firstMatching(
+    workflows,
+    /github\/codeql-action|dependency-review-action|\bsemgrep\b|\btrivy\b|\bsnyk\b/i,
+  );
 
   const dockerfile = dockerfiles[0];
   const dockerContent = dockerfile?.content ?? "";
@@ -362,6 +375,36 @@ export async function analyzePublicRepository(
     addEvidence(evidence, "docker", "ci-build", "docker.ciBuild", "Docker image build detected in GitHub Actions", ciDockerBuild.path);
   }
 
+
+  if (workflowFiles.length > 0) {
+    addEvidence(evidence, "cicd", "workflow", "cicd.workflow", `${workflowFiles.length} GitHub Actions workflow(s) detected`, workflowFiles[0], { count: workflowFiles.length });
+  }
+  if (ciBuildMatch) {
+    addEvidence(evidence, "cicd", "build", "cicd.build", "A production build is executed in CI", ciBuildMatch.path);
+  }
+  if (ciTestMatch || ciTypecheckMatch) {
+    addEvidence(evidence, "cicd", "quality-gate", "cicd.qualityGate", "A test or type-check quality gate runs in CI", (ciTestMatch ?? ciTypecheckMatch)?.path);
+  }
+
+  if (rootReadme) {
+    addEvidence(evidence, "documentation", "readme", "documentation.readme", "Root README detected", rootReadme);
+  }
+  if (architectureDoc) {
+    addEvidence(evidence, "documentation", "architecture", "documentation.architecture", "Architecture documentation detected", architectureDoc);
+  }
+  if (docsFiles.length > 0) {
+    addEvidence(evidence, "documentation", "docs", "documentation.docs", `${docsFiles.length} documentation file(s) detected`, docsFiles[0], { count: docsFiles.length });
+  }
+
+  if (securityPolicy) {
+    addEvidence(evidence, "security", "policy", "security.policy", "SECURITY policy detected", securityPolicy);
+  }
+  if (dependencyBot) {
+    addEvidence(evidence, "security", "dependency-bot", "security.dependencyBot", "Automated dependency maintenance detected", dependencyBot);
+  }
+  if (codeScanningMatch) {
+    addEvidence(evidence, "security", "code-scanning", "security.codeScanning", "Automated security scanning detected in CI", codeScanningMatch.path);
+  }
   if (k8sFiles.length > 0) {
     addEvidence(evidence, "kubernetes", "files", "kubernetes.files", `${k8sFiles.length} Kubernetes/Helm manifest file(s) detected`, k8sFiles[0], { count: k8sFiles.length });
   }
@@ -423,6 +466,21 @@ export async function analyzePublicRepository(
       + (probeManifest ? 20 : 0)
       + (resourcesManifest ? 15 : 0),
   );
+  const cicdProgress = clamp(
+    (workflowFiles.length > 0 ? 35 : 0)
+      + (ciBuildMatch ? 30 : 0)
+      + (ciTestMatch || ciTypecheckMatch ? 35 : 0),
+  );
+  const documentationProgress = clamp(
+    (rootReadme ? 35 : 0)
+      + (architectureDoc ? 35 : 0)
+      + Math.min(30, docsFiles.length * 10),
+  );
+  const securityProgress = clamp(
+    (securityPolicy ? 30 : 0)
+      + (dependencyBot ? 30 : 0)
+      + (codeScanningMatch ? 40 : 0),
+  );
 
   const skills = [
     skill("typescript", "TypeScript", typescriptProgress, 50, 12, evidence, "core"),
@@ -430,7 +488,10 @@ export async function analyzePublicRepository(
     skill("react", "React", reactProgress, 71, 40, evidence),
     skill("postgres", "PostgreSQL", postgresProgress, 18, 72, evidence),
     skill("testing", "Testing", testingProgress, 50, 75, evidence),
+    skill("cicd", "CI/CD", cicdProgress, 68, 72, evidence),
     skill("docker", "Docker", dockerProgress, 82, 72, evidence),
+    skill("documentation", "Documentation", documentationProgress, 30, 92, evidence),
+    skill("security", "Security", securityProgress, 66, 93, evidence),
     skill("kubernetes", "Kubernetes", kubernetesProgress, 92, 92, evidence, "locked"),
   ];
 
@@ -447,6 +508,13 @@ export async function analyzePublicRepository(
     typescriptStrict,
     hasArchitectureDoc: Boolean(architectureDoc),
     ciRunsTypecheck: Boolean(ciTypecheckMatch),
+    hasWorkflow: workflowFiles.length > 0,
+    ciRunsBuild: Boolean(ciBuildMatch),
+    hasReadme: Boolean(rootReadme),
+    docsFileCount: docsFiles.length,
+    hasSecurityPolicy: Boolean(securityPolicy),
+    hasDependencyBot: Boolean(dependencyBot),
+    hasCodeScanning: Boolean(codeScanningMatch),
   };
 
   const detectedSkills = skills.filter((entry) => entry.progress > 0);
@@ -459,8 +527,9 @@ export async function analyzePublicRepository(
     ["Type safety", typescriptProgress],
     ["UI framework", Math.max(reactProgress, nextProgress)],
     ["Database", postgresProgress],
-    ["Delivery", clamp((workflowFiles.length > 0 ? 30 : 0) + dockerProgress * 0.7)],
+    ["Delivery", Math.max(cicdProgress, clamp((workflowFiles.length > 0 ? 30 : 0) + dockerProgress * 0.7))],
     ["Testing", testingProgress],
+    ["Security", securityProgress],
   ];
 
   const level = Math.max(1, Math.min(50, Math.round(averageProgress / 3 + evidence.length * 0.7 + qualitySignals * 2)));

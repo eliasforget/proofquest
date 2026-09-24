@@ -2,20 +2,20 @@
 
 ## Immediate
 
-1. Tester la v0.11 sur un profil rendu public et vérifier les liens de commit.
-2. Ajouter de nouvelles familles de quêtes vérifiables : CI/CD, documentation et sécurité.
-3. Ajouter une vue détaillée d'une preuve avec diff GitHub, objectifs débloqués et repository.
-4. Ajouter des achievements calculés côté serveur.
-5. Instrumenter onboarding → scan → quest start → verified completion → retour utilisateur.
+1. Tester les 7 familles de quêtes sur plusieurs repositories publics réels.
+2. Ajouter une vraie page d'édition du profil : bio, titre et liens publics.
+3. Ajouter partage Open Graph / cartes sociales pour les preuves et le profil.
+4. Ajouter des événements produit anonymisés : onboarding, scan, quest start, verified completion, proof share.
+5. Préparer un petit groupe de bêta-testeurs avant toute acquisition payante.
 
-## Architecture
+## Evidence Engine
 
-Graphify a confirmé que le gros analyseur GitHub devait être découpé. v0.11 extrait déjà :
-- `lib/github/client.ts` ;
-- `lib/github/quest-engine.ts`.
-
-Continuer progressivement sans régression avant de séparer complètement l'Evidence Engine.
+Graphify continue de signaler `github.ts` comme un hub important. Le transport et le moteur de quêtes sont déjà séparés. Le prochain refactor devra extraire progressivement :
+- détection des technologies ;
+- détection qualité / CI ;
+- détection DevOps / sécurité ;
+- calcul des scores de compétences.
 
 ## Product rule
 
-Ne pas lancer d'acquisition payante avant d'avoir validé plusieurs retours utilisateurs sur la boucle : connexion → analyse → quête → commit → preuve → profil public.
+Une nouvelle quête doit toujours être liée à des critères vérifiables côté serveur. Ne jamais attribuer de l'XP à partir d'un simple clic ou d'une déclaration utilisateur.

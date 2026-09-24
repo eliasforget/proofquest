@@ -2,7 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "npm:@supabase/server";
 import { corsHeaders } from "jsr:@supabase/supabase-js@2/cors";
 
-type QuestKind = "testing" | "docker" | "kubernetes" | "hardening";
+type QuestKind = "testing" | "docker" | "cicd" | "documentation" | "security" | "kubernetes" | "hardening";
 type QuestAction = "start" | "verify";
 
 type GitHubRepository = {
@@ -57,6 +57,9 @@ const API_VERSION = "2026-03-10";
 const QUEST_REWARD: Record<QuestKind, number> = {
   testing: 850,
   docker: 900,
+  cicd: 950,
+  documentation: 600,
+  security: 1100,
   kubernetes: 1250,
   hardening: 700,
 };
@@ -64,6 +67,9 @@ const QUEST_REWARD: Record<QuestKind, number> = {
 const QUEST_TARGET: Record<QuestKind, string> = {
   testing: "testing",
   docker: "docker",
+  cicd: "cicd",
+  documentation: "documentation",
+  security: "security",
   kubernetes: "kubernetes",
   hardening: "typescript",
 };
@@ -94,7 +100,7 @@ function parseRepository(value: unknown) {
 }
 
 function isQuestKind(value: unknown): value is QuestKind {
-  return ["testing", "docker", "kubernetes", "hardening"].includes(String(value));
+  return ["testing", "docker", "cicd", "documentation", "security", "kubernetes", "hardening"].includes(String(value));
 }
 
 function isAction(value: unknown): value is QuestAction {
@@ -172,6 +178,12 @@ async function evaluateQuest(
   const rootReadme = paths.find((path) => /^readme\.(md|mdx|txt)$/i.test(path));
   const architectureDoc = paths.find((path) =>
     /(^|\/)(architecture|arch|technical-design|design-doc)(\.[^/]+)?\.md$/i.test(path),
+  );
+  const docsFiles = matches(paths, /(^|\/)(docs?|documentation)\/.*\.(md|mdx|txt)$/i);
+  const securityPolicy = paths.find((path) => /(^|\/)(\.github\/)?security\.md$/i.test(path));
+  const dependencyBot = paths.find((path) =>
+    /(^|\/)\.github\/dependabot\.ya?ml$/i.test(path)
+    || /(^|\/)renovate(?:\.json|\.json5|\.ya?ml)$/i.test(path),
   );
   const k8sPaths = matches(
     paths,
@@ -271,6 +283,14 @@ async function evaluateQuest(
     /\b(npm\s+run\s+typecheck|pnpm\s+(?:run\s+)?typecheck|yarn\s+(?:run\s+)?typecheck|tsc\s+--noEmit)\b/i.test(
       workflows,
     );
+  const ciRunsBuild =
+    /(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?build\b|\bnext\s+build\b|\bvite\s+build\b|\bgradle(?:w)?\s+build\b|\bmvn\s+(?:package|verify)\b/i.test(
+      workflows,
+    );
+  const hasCodeScanning =
+    /github\/codeql-action|dependency-review-action|\bsemgrep\b|\btrivy\b|\bsnyk\b/i.test(
+      workflows,
+    );
 
   const evaluations: Record<QuestKind, Objective[]> = {
     testing: [
@@ -282,6 +302,21 @@ async function evaluateQuest(
       { id: "dockerfile", completed: Boolean(dockerfilePath) },
       { id: "multistage", completed: dockerMultiStage },
       { id: "docs", completed: dockerDocumented },
+    ],
+    cicd: [
+      { id: "workflow", completed: workflowPaths.length > 0 },
+      { id: "build", completed: ciRunsBuild },
+      { id: "quality-gate", completed: ciRunsTests || ciRunsTypecheck },
+    ],
+    documentation: [
+      { id: "readme", completed: Boolean(rootReadme) },
+      { id: "architecture", completed: Boolean(architectureDoc) },
+      { id: "docs", completed: docsFiles.length >= 2 },
+    ],
+    security: [
+      { id: "policy", completed: Boolean(securityPolicy) },
+      { id: "dependency-bot", completed: Boolean(dependencyBot) },
+      { id: "code-scanning", completed: hasCodeScanning },
     ],
     kubernetes: [
       { id: "deployment", completed: hasDeployment },
@@ -323,6 +358,31 @@ function isRelevantFile(kind: QuestKind, filename: string) {
       /(^|\/)\.dockerignore$/i.test(path) ||
       /(^|\/)(docker-)?compose(?:\.[^/]+)?\.ya?ml$/i.test(path) ||
       /^readme\.(md|mdx|txt)$/i.test(path)
+    );
+  }
+
+  if (kind === "cicd") {
+    return (
+      /^\.github\/workflows\/.*\.ya?ml$/i.test(path) ||
+      /(^|\/)package\.json$/i.test(path) ||
+      /(^|\/)(pom\.xml|build\.gradle(?:\.kts)?|gradlew)$/i.test(path)
+    );
+  }
+
+  if (kind === "documentation") {
+    return (
+      /^readme\.(md|mdx|txt)$/i.test(path) ||
+      /(^|\/)(docs?|documentation)\/.*\.(md|mdx|txt)$/i.test(path) ||
+      /(^|\/)(architecture|arch|technical-design|design-doc)(\.[^/]+)?\.md$/i.test(path)
+    );
+  }
+
+  if (kind === "security") {
+    return (
+      /(^|\/)(\.github\/)?security\.md$/i.test(path) ||
+      /(^|\/)\.github\/dependabot\.ya?ml$/i.test(path) ||
+      /(^|\/)renovate(?:\.json|\.json5|\.ya?ml)$/i.test(path) ||
+      /^\.github\/workflows\/.*\.ya?ml$/i.test(path)
     );
   }
 

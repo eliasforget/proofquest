@@ -4,7 +4,7 @@ import { Brand } from "@/components/Brand";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { getAccountSnapshot, getPublicProfile } from "@/lib/auth";
 import { getAuthCopy } from "@/lib/auth-i18n";
-import type { Locale } from "@/lib/i18n";
+import { questTitleFor, type Locale } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale-server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,6 +32,9 @@ const labels = {
     skillsWord: "compétences",
     evidenceMap: "CARTE DE PREUVES",
     verifiedChip: "VÉRIFIÉ",
+    achievements: "ACHIEVEMENTS",
+    achievementsBody: "Badges calculés uniquement à partir de preuves publiques vérifiées.",
+    details: "Voir la preuve",
   },
   en: {
     identity: "PUBLIC PROOF PROFILE",
@@ -54,6 +57,9 @@ const labels = {
     skillsWord: "skills",
     evidenceMap: "EVIDENCE MAP",
     verifiedChip: "VERIFIED",
+    achievements: "ACHIEVEMENTS",
+    achievementsBody: "Badges computed only from verified public proof.",
+    details: "View proof",
   },
   de: {
     identity: "ÖFFENTLICHES NACHWEISPROFIL",
@@ -76,6 +82,9 @@ const labels = {
     skillsWord: "Skills",
     evidenceMap: "NACHWEISKARTE",
     verifiedChip: "VERIFIZIERT",
+    achievements: "ACHIEVEMENTS",
+    achievementsBody: "Badges werden nur aus verifizierten öffentlichen Nachweisen berechnet.",
+    details: "Nachweis ansehen",
   },
   es: {
     identity: "PERFIL PÚBLICO DE PRUEBAS",
@@ -98,6 +107,9 @@ const labels = {
     skillsWord: "competencias",
     evidenceMap: "MAPA DE PRUEBAS",
     verifiedChip: "VERIFICADO",
+    achievements: "LOGROS",
+    achievementsBody: "Insignias calculadas únicamente a partir de pruebas públicas verificadas.",
+    details: "Ver prueba",
   },
 } as const;
 
@@ -266,6 +278,56 @@ export default async function PublicProfilePage({
   const verifiedQuests = quests.filter(
     (quest) => Boolean(quest.verified_commit_sha),
   );
+  const verifiedKinds = new Set(verifiedQuests.map((quest) => quest.kind));
+
+  const achievementCopy = {
+    fr: {
+      first: ["PREMIÈRE PREUVE", "Valider une première quête avec un commit GitHub."],
+      triple: ["TRIPLE PREUVE", "Valider au moins 3 quêtes vérifiées."],
+      polyrepo: ["POLYREPO", "Cartographier au moins 2 repositories."],
+      xp: ["2500 XP", "Atteindre 2 500 XP vérifiés."],
+      shield: ["SHIELD READY", "Valider une preuve de sécurité."],
+      constellation: ["CONSTELLATION", "Cartographier au moins 7 compétences."],
+    },
+    en: {
+      first: ["FIRST PROOF", "Verify a first quest with a GitHub commit."],
+      triple: ["TRIPLE PROOF", "Verify at least 3 quests."],
+      polyrepo: ["POLYREPO", "Map at least 2 repositories."],
+      xp: ["2500 XP", "Reach 2,500 verified XP."],
+      shield: ["SHIELD READY", "Verify a security proof."],
+      constellation: ["CONSTELLATION", "Map at least 7 skills."],
+    },
+    de: {
+      first: ["ERSTER NACHWEIS", "Eine erste Quest mit GitHub-Commit verifizieren."],
+      triple: ["DREIFACH-NACHWEIS", "Mindestens 3 Quests verifizieren."],
+      polyrepo: ["POLYREPO", "Mindestens 2 Repositories kartieren."],
+      xp: ["2500 XP", "2.500 verifizierte XP erreichen."],
+      shield: ["SHIELD READY", "Einen Security-Nachweis verifizieren."],
+      constellation: ["KONSTELLATION", "Mindestens 7 Skills kartieren."],
+    },
+    es: {
+      first: ["PRIMERA PRUEBA", "Verificar una primera misión con un commit de GitHub."],
+      triple: ["TRIPLE PRUEBA", "Verificar al menos 3 misiones."],
+      polyrepo: ["POLYREPO", "Mapear al menos 2 repositorios."],
+      xp: ["2500 XP", "Alcanzar 2.500 XP verificados."],
+      shield: ["SHIELD READY", "Verificar una prueba de seguridad."],
+      constellation: ["CONSTELACIÓN", "Mapear al menos 7 competencias."],
+    },
+  } as const;
+
+  const ac = achievementCopy[locale];
+  const achievements: Array<{
+    id: string;
+    unlocked: boolean;
+    copy: readonly [string, string];
+  }> = [
+    { id: "first", unlocked: verifiedQuests.length >= 1, copy: ac.first },
+    { id: "triple", unlocked: verifiedQuests.length >= 3, copy: ac.triple },
+    { id: "polyrepo", unlocked: repositories.length >= 2, copy: ac.polyrepo },
+    { id: "xp", unlocked: totalXp >= 2500, copy: ac.xp },
+    { id: "shield", unlocked: verifiedKinds.has("security"), copy: ac.shield },
+    { id: "constellation", unlocked: skills.length >= 7, copy: ac.constellation },
+  ];
 
   return (
     <main className="dashboard-shell public-profile-shell proof-profile-v11">
@@ -330,6 +392,33 @@ export default async function PublicProfilePage({
           <strong>{totalXp.toLocaleString(locale)}</strong>
           <small>{t.serverVerified}</small>
         </article>
+      </section>
+
+      <section className="panel proof-achievement-panel">
+        <div className="panel-head">
+          <div>
+            <span className="micro-label">{t.achievements}</span>
+            <h2>{achievements.filter((achievement) => achievement.unlocked).length} / {achievements.length}</h2>
+            <p>{t.achievementsBody}</p>
+          </div>
+          <span className="live-chip">SERVER PROOF</span>
+        </div>
+        <div className="proof-achievement-grid">
+          {achievements.map((achievement) => (
+            <article
+              key={achievement.id}
+              className={achievement.unlocked ? "achievement-unlocked" : "achievement-locked"}
+            >
+              <div className="achievement-orb">
+                {achievement.unlocked ? "✓" : "◇"}
+              </div>
+              <div>
+                <strong>{achievement.copy[0]}</strong>
+                <p>{achievement.copy[1]}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="proof-profile-grid">
@@ -416,13 +505,18 @@ export default async function PublicProfilePage({
               const proofUrl = quest.verified_commit_sha
                 ? `https://github.com/${quest.repository_full_name}/commit/${quest.verified_commit_sha}`
                 : null;
+              const [proofOwner, proofRepo] = quest.repository_full_name.split("/");
+              const detailsHref =
+                proofOwner && proofRepo
+                  ? `/u/${profile.username}/proof/${encodeURIComponent(quest.kind)}/${encodeURIComponent(proofOwner)}/${encodeURIComponent(proofRepo)}`
+                  : null;
 
               return (
                 <article key={quest.id}>
                   <div className="proof-timeline-marker">✓</div>
                   <div className="proof-timeline-copy">
                     <div>
-                      <span>{quest.kind.toUpperCase()}</span>
+                      <span>{questTitleFor(quest.kind as Parameters<typeof questTitleFor>[0], locale)}</span>
                       <strong>{quest.repository_full_name}</strong>
                     </div>
                     <small>
@@ -434,6 +528,9 @@ export default async function PublicProfilePage({
                   </div>
                   <div className="proof-timeline-reward">
                     <strong>+{quest.xp_reward} XP</strong>
+                    {detailsHref ? (
+                      <Link href={detailsHref}>{t.details} →</Link>
+                    ) : null}
                     {proofUrl ? (
                       <a
                         href={proofUrl}
