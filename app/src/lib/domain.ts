@@ -36,7 +36,7 @@ export type QuestObjective = {
 };
 
 export type QuestDraft = {
-  kind: "testing" | "docker" | "kubernetes" | "hardening";
+  kind: "testing" | "docker" | "cicd" | "documentation" | "security" | "kubernetes" | "hardening";
   title: string;
   description: string;
   targetSkillKey: string;
