@@ -219,8 +219,6 @@ export async function analyzePublicRepository(
   const typecheckScript = scripts.find(({ name, command }) =>
     /^(typecheck|type-check|check-types|types)$/i.test(name) || /\btsc\b[^\n]*--noEmit\b/i.test(command),
   );
-  const buildScript = scripts.find(({ name }) => /^(build|build:prod|build:production)$/i.test(name));
-
   const ciTestMatch = firstMatching(
     workflows,
     /(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?(?:test|test:[\w:-]+)\b|\b(?:vitest|jest)\b|\bplaywright\s+test\b|\bcypress\s+run\b/i,
