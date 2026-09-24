@@ -1,3 +1,14 @@
+## v0.12.0 — Deeper proof families
+
+- Add three new server-verifiable quest families: CI/CD, documentation and security.
+- Expand the Evidence Engine with GitHub Actions build gates, documentation coverage, SECURITY policy, dependency automation and code scanning signals.
+- Expand the skill constellation with CI/CD, Documentation and Security nodes.
+- Add canonical server XP rewards for the new quest kinds.
+- Deploy verify-quest Edge Function v4 with relevant-file checks for all seven quest families.
+- Add public proof detail pages exposing the exact commit, relevant files, baseline and newly unlocked objectives.
+- Add proof-backed public achievements derived from verified quests, repositories, skills and XP.
+- Keep FR / EN / DE / ES coverage for the new quest and evidence surfaces.
+
 ## v0.11.0 — Proof portfolio and quest deck
 
 - Public profiles now expose a visual multi-repository proof portfolio.
