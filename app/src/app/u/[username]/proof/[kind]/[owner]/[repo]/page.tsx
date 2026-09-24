@@ -158,7 +158,7 @@ export default async function PublicProofPage({
 
   if (!profile) {
     return (
-      <main className="site-shell public-profile-shell">
+      <main lang={locale} className="site-shell public-profile-shell">
         <header className="topbar">
           <Brand />
           <LocaleSwitcher locale={locale} />
@@ -185,7 +185,7 @@ export default async function PublicProofPage({
 
   if (!quest) {
     return (
-      <main className="site-shell public-profile-shell">
+      <main lang={locale} className="site-shell public-profile-shell">
         <header className="topbar">
           <Brand />
           <div className="topbar-cluster">
@@ -213,7 +213,7 @@ export default async function PublicProofPage({
   const kindValue = quest.kind as Parameters<typeof questTitleFor>[0];
 
   return (
-    <main className="dashboard-shell proof-detail-shell">
+    <main lang={locale} className="dashboard-shell proof-detail-shell">
       <header className="topbar dashboard-top">
         <Brand />
         <div className="topbar-cluster">

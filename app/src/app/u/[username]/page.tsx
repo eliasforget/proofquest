@@ -179,7 +179,7 @@ export default async function PublicProfilePage({
 
   if (!profile) {
     return (
-      <main className="site-shell public-profile-shell">
+      <main lang={locale} className="site-shell public-profile-shell">
         <header className="topbar">
           <Brand />
           <div className="topbar-cluster">
@@ -338,7 +338,7 @@ export default async function PublicProfilePage({
   ];
 
   return (
-    <main className="dashboard-shell public-profile-shell proof-profile-v11">
+    <main lang={locale} className="dashboard-shell public-profile-shell proof-profile-v11">
       <header className="topbar dashboard-top">
         <Brand />
         <div className="topbar-cluster">
