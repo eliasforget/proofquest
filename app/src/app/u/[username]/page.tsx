@@ -316,14 +316,18 @@ export default async function PublicProfilePage({
   } as const;
 
   const ac = achievementCopy[locale];
-  const achievements = [
-    { id: "first", unlocked: verifiedQuests.length >= 1, ...Object.fromEntries([["copy", ac.first]]) },
-    { id: "triple", unlocked: verifiedQuests.length >= 3, ...Object.fromEntries([["copy", ac.triple]]) },
-    { id: "polyrepo", unlocked: repositories.length >= 2, ...Object.fromEntries([["copy", ac.polyrepo]]) },
-    { id: "xp", unlocked: totalXp >= 2500, ...Object.fromEntries([["copy", ac.xp]]) },
-    { id: "shield", unlocked: verifiedKinds.has("security"), ...Object.fromEntries([["copy", ac.shield]]) },
-    { id: "constellation", unlocked: skills.length >= 7, ...Object.fromEntries([["copy", ac.constellation]]) },
-  ] as Array<{ id: string; unlocked: boolean; copy: readonly [string, string] }>;
+  const achievements: Array<{
+    id: string;
+    unlocked: boolean;
+    copy: readonly [string, string];
+  }> = [
+    { id: "first", unlocked: verifiedQuests.length >= 1, copy: ac.first },
+    { id: "triple", unlocked: verifiedQuests.length >= 3, copy: ac.triple },
+    { id: "polyrepo", unlocked: repositories.length >= 2, copy: ac.polyrepo },
+    { id: "xp", unlocked: totalXp >= 2500, copy: ac.xp },
+    { id: "shield", unlocked: verifiedKinds.has("security"), copy: ac.shield },
+    { id: "constellation", unlocked: skills.length >= 7, copy: ac.constellation },
+  ];
 
   return (
     <main className="dashboard-shell public-profile-shell proof-profile-v11">
