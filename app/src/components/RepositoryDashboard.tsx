@@ -85,7 +85,7 @@ export function RepositoryDashboard({ analysis, locale, account, cloudQuestState
           </section>
         </aside>
       </section>
-      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.11</footer>
+      <footer className="analysis-footer">{t.dashboard.analyzed}: {formatUtc(analysis.analyzedAt, locale)} · {t.dashboard.footerEngine} v0.12</footer>
     </main>
   );
 }
