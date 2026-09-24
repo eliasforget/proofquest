@@ -13,6 +13,13 @@ export type DeepFacts = {
   typescriptStrict: boolean;
   hasArchitectureDoc: boolean;
   ciRunsTypecheck: boolean;
+  hasWorkflow: boolean;
+  ciRunsBuild: boolean;
+  hasReadme: boolean;
+  docsFileCount: number;
+  hasSecurityPolicy: boolean;
+  hasDependencyBot: boolean;
+  hasCodeScanning: boolean;
 };
 
 function completedObjective(
@@ -49,6 +56,18 @@ export function completedQuestList(
 
   if (facts.hasDeployment && facts.hasService && facts.hasProbe) {
     completed.push({ kind: "kubernetes", xpReward: 1250 });
+  }
+
+  if (facts.hasWorkflow && facts.ciRunsBuild && (facts.ciRunsTests || facts.ciRunsTypecheck)) {
+    completed.push({ kind: "cicd", xpReward: 950 });
+  }
+
+  if (facts.hasReadme && facts.hasArchitectureDoc && facts.docsFileCount >= 2) {
+    completed.push({ kind: "documentation", xpReward: 600 });
+  }
+
+  if (facts.hasSecurityPolicy && facts.hasDependencyBot && facts.hasCodeScanning) {
+    completed.push({ kind: "security", xpReward: 1100 });
   }
 
   if (
@@ -168,6 +187,87 @@ export function buildQuestDeck(
     xpReward: 1250,
   };
 
+  const cicd: QuestDraft = {
+    kind: "cicd",
+    title: "Delivery Circuit",
+    description:
+      "Turn repository automation into a repeatable delivery pipeline with real quality gates.",
+    targetSkillKey: "cicd",
+    criteria: [
+      "Add a GitHub Actions workflow",
+      "Run a build in CI",
+      "Run tests or type checking in CI",
+    ],
+    objectives: [
+      completedObjective("workflow", facts.hasWorkflow, ids("cicd", "workflow")),
+      completedObjective("build", facts.ciRunsBuild, ids("cicd", "build")),
+      completedObjective(
+        "quality-gate",
+        facts.ciRunsTests || facts.ciRunsTypecheck,
+        ids("cicd", "quality-gate"),
+      ),
+    ],
+    xpReward: 950,
+  };
+
+  const documentation: QuestDraft = {
+    kind: "documentation",
+    title: "Knowledge Beacon",
+    description:
+      "Make the repository understandable without relying on tribal knowledge.",
+    targetSkillKey: "documentation",
+    criteria: [
+      "Keep a root README",
+      "Document the architecture",
+      "Add at least 2 documentation files",
+    ],
+    objectives: [
+      completedObjective("readme", facts.hasReadme, ids("documentation", "readme")),
+      completedObjective(
+        "architecture",
+        facts.hasArchitectureDoc,
+        ids("documentation", "architecture"),
+      ),
+      completedObjective(
+        "docs",
+        facts.docsFileCount >= 2,
+        ids("documentation", "docs"),
+      ),
+    ],
+    xpReward: 600,
+  };
+
+  const security: QuestDraft = {
+    kind: "security",
+    title: "Shield Protocol",
+    description:
+      "Add explicit security ownership, dependency maintenance and automated code scanning.",
+    targetSkillKey: "security",
+    criteria: [
+      "Add a SECURITY policy",
+      "Enable Dependabot or Renovate",
+      "Enable CodeQL or dependency review in CI",
+    ],
+    objectives: [
+      completedObjective(
+        "policy",
+        facts.hasSecurityPolicy,
+        ids("security", "policy"),
+      ),
+      completedObjective(
+        "dependency-bot",
+        facts.hasDependencyBot,
+        ids("security", "dependency-bot"),
+      ),
+      completedObjective(
+        "code-scanning",
+        facts.hasCodeScanning,
+        ids("security", "code-scanning"),
+      ),
+    ],
+    xpReward: 1100,
+  };
+
   const hardening: QuestDraft = {
     kind: "hardening",
     title: "Proof Hardening",
@@ -200,7 +300,7 @@ export function buildQuestDeck(
   };
 
   const dockerSkill = skills.find((skill) => skill.id === "docker");
-  const candidates = [testing, docker];
+  const candidates = [testing, docker, cicd, documentation, security];
 
   if ((dockerSkill?.progress ?? 0) >= 55 || facts.hasDeployment) {
     candidates.push(kubernetes);
